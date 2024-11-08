@@ -11,9 +11,9 @@ const router = express.Router()
 // })
 
 // es lo mismo q lo de arriba pero asi ahorramos espacio
-router.route('/')
+router.route('/login')
   .get((req, res) => {
-    res.send('hello world')
+    res.render('auth/login') //como le hemos dicho q las vistas estan en la carpeta views en index.js solo hay q poner el path sin esa carperta
   })
 
   .post((req, res) => {
