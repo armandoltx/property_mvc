@@ -1,4 +1,5 @@
-const express = require('express') // extraemos el paquete usamos commonJS
+// const express = require('express') // extraemos el paquete usamos commonJS
+import express from 'express' // extraemos el paquete usamos ECMAScript modules
 
 // crea la funcion
 const app = express() // lo asignamos a la var app
