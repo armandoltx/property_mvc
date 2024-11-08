@@ -9,6 +9,9 @@ const app = express() // lo asignamos a la var app
 app.set('view engine', 'pug') // que tipo de engine usamos para la vista
 app.set('views', './views') // que carpetas son las views
 
+// Carpeta Publica
+// el contenedor de los archivos estaticos y la carpeta que pueden abrir las personas que visitan el sitio web
+app.use(express.static('public'))
 // routing los diferentes end points que soporta nuestra app.
 // app.get('/', usuarioRoutes) // get busca la ruta especifica por eso no encuentra nosotros
 app.use('/auth', usuarioRoutes) // use busca la ruta q inicie con lo q esta en las comillas en este caso "/"
