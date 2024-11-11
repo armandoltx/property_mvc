@@ -1,6 +1,7 @@
 
 const formularioLogin = (req, res) => {
   res.render('auth/login', {
+    pagina: 'Iniciar Sesion',
     autenticado: true
   }) //como le hemos dicho q las vistas estan en la carpeta views en index.js solo hay q poner el path sin esa carperta
 }
