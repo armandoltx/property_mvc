@@ -1,9 +1,18 @@
 // const express = require('express') // extraemos el paquete usamos commonJS
 import express from 'express' // extraemos el paquete usamos ECMAScript modules
 import usuarioRoutes from './routes/usuarioRoutes.js'
+import db from './config/db.js'
 
 // crea la funcion
 const app = express() // lo asignamos a la var app
+
+// Conexion a la base de datos
+try {
+  await db.authenticate()
+  console.log('conexion correcta a la base de datos')
+} catch (error) {
+  console.log(error)
+}
 
 // Habilitar Pug
 app.set('view engine', 'pug') // que tipo de engine usamos para la vista
