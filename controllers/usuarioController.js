@@ -13,7 +13,15 @@ const formularioRegistro = (req, res) => {
   })
 }
 
+const formularioOlvidePassword = (req, res) => {
+  res.render('auth/olvide-password', {
+    pagina: 'Recupera tu acceso'
+
+  })
+}
+
 export {  // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   formularioLogin,
-  formularioRegistro
+  formularioRegistro,
+  formularioOlvidePassword
 }
