@@ -19,11 +19,14 @@ const registrar = async(req, res) => {
   // console.log('registrando...') // imprime en el terminal
   // console.log(req.body)
 
+  // Extraer los datos
+  const { nombre, email, password } = req.body
+
   // Validación
   await check('nombre').notEmpty().withMessage('El Nombre no puede ir vacio').run(req)
   await check('email').isEmail().withMessage('Eso no parece un email').run(req)
   await check('password').isLength({ min: 6 }).withMessage('El Password debe ser de al menos 6 caracteres').run(req)
-  await check('repetir_password').equals(req.body.password).withMessage('Los Passwords no son iguales').run(req)
+  await check('repetir_password').equals(password).withMessage('Los Passwords no son iguales').run(req)
 
   let resultado = validationResult(req)
   // res.json(resultado.array())
@@ -42,7 +45,7 @@ const registrar = async(req, res) => {
   }
 
   // Verificar que el usuario no este duplicado
-  const existeUsuario = await Usuario.findOne( { where: { email: req.body.email } } )
+  const existeUsuario = await Usuario.findOne( { where: { email } } )
   // console.log(existeUsuario)
   if(existeUsuario) {
     return res.render('auth/registro', {
@@ -54,7 +57,7 @@ const registrar = async(req, res) => {
       }
     })
   }
-  // return
+  return
 
 
   const usuario = await Usuario.create(req.body)
