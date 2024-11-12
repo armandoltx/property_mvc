@@ -57,11 +57,15 @@ const registrar = async(req, res) => {
       }
     })
   }
-  return
 
-
-  const usuario = await Usuario.create(req.body)
-  res.json(usuario)
+  // Crear el usuario
+  await Usuario.create({
+    nombre, // lo podemos pasar asi pq hemos destructurado anteriormente
+    email,
+    password,
+    token: 123
+  })
+  // res.json(usuario)
 }
 
 const formularioOlvidePassword = (req, res) => {
