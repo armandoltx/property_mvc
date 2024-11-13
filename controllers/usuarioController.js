@@ -83,6 +83,35 @@ const registrar = async(req, res) => {
   })
 }
 
+// funcion que comprueba una cuenta
+const confirmarCuenta = async (req, res) => {
+  // console.log('comprobando....')
+  // console.log(req.params.token)
+
+  // verificar el token es valido
+  const usuario = await Usuario.findOne( { where: {token: req.params.token} } )
+
+  // mensaje si no hay usuario
+  if(!usuario) {
+    res.render('auth/confirmar-cuenta', {
+      pagina: 'Error al confirmar tu cuenta',
+      mensaje: 'Hubo un error al confirmar tu cuenta, intenta de nuevo',
+      error: true
+    })
+  }
+
+  // Confirmar cuenta si hay usuario
+  usuario.token = null;
+  usuario.confirmado = true
+  await usuario.save()
+
+  res.render('auth/confirmar-cuenta', {
+    pagina: 'Cuenta Confirmada',
+    mensaje: 'La cuenta se confirmo correctamente'
+  })
+
+}
+
 const formularioOlvidePassword = (req, res) => {
   res.render('auth/olvide-password', {
     pagina: 'Recupera tu acceso'
@@ -94,5 +123,6 @@ export {  // es un export nombrado, hay q usar llaves y el mimso nombre cuando l
   formularioLogin,
   formularioRegistro,
   registrar,
+  confirmarCuenta,
   formularioOlvidePassword
 }

@@ -31,7 +31,7 @@ app.use('/auth', usuarioRoutes) // use busca la ruta q inicie con lo q esta en l
 
 
 // Definir un puerto y arrancar el proyecto
-const port= 4000
+const port= process.env.PORT || 4000
 
 // escucha o conectate en el puerto y corre el callback
 app.listen(port, () => {
