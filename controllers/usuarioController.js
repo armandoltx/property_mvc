@@ -1,7 +1,7 @@
 import { check, validationResult } from 'express-validator'
 import Usuario from '../models/Usuario.js'
 import { generarId } from '../helpers/token.js'
-import { emailRegistro } from '../helpers/emails.js'
+import { emailRegistro, emailOlvidePassword } from '../helpers/emails.js'
 
 const formularioLogin = (req, res) => {
   res.render('auth/login', {
@@ -117,15 +117,71 @@ const confirmarCuenta = async (req, res) => {
 
 const formularioOlvidePassword = (req, res) => {
   res.render('auth/olvide-password', {
-    pagina: 'Recupera tu acceso'
-
+    pagina: 'Recupera tu acceso',
+    csrfToken: req.csrfToken(),
   })
 }
+
+const resetPasword = async (req, res) => {
+  // Validación
+  await check('email').isEmail().withMessage('Eso no parece un email').run(req)
+
+  let resultado = validationResult(req)
+
+  // Verificar que el resultado este vacio
+  if(!resultado.isEmpty()) {
+    // Errores
+    return res.render('auth/olvide-password', {
+      pagina: 'Recupera tu acceso a Property',
+      csrfToken : req.csrfToken(),
+      errores: resultado.array()
+    })
+  }
+
+  // Buscar el usuario
+
+  const { email } = req.body
+  const usuario = await Usuario.findOne({ where: { email } } )
+  if(!usuario) {
+    return res.render('auth/olvide-password', {
+      pagina: 'Recupera tu acceso a Property',
+      csrfToken : req.csrfToken(),
+      errores: [{msg: 'El Email no Pertenece a ningún usuario'}]
+    })
+  }
+
+  // Generar un token y enviar el email
+  usuario.token = generarId();
+  await usuario.save();
+
+  // Enviar un email
+  emailOlvidePassword({
+    email: usuario.email,
+    nombre: usuario.nombre,
+    token: usuario.token
+  })
+
+  // Mostrar mensaje de confirmación
+  res.render('templates/mensaje', {
+    pagina: 'Reestablece tu Password',
+    mensaje: 'Hemos enviado un email con las instrucciones'
+  })
+}
+
+const comprobarToken = (req, res, next) => {
+  next()
+}
+
+const nuevoPassword = (req, res) => {}
+
 
 export {  // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   formularioLogin,
   formularioRegistro,
   registrar,
   confirmarCuenta,
-  formularioOlvidePassword
+  formularioOlvidePassword,
+  resetPasword,
+  comprobarToken,
+  nuevoPassword
 }
