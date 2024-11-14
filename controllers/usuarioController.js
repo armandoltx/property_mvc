@@ -30,6 +30,31 @@ const autenticar = async (req, res) => {
     })
   }
 
+  // Comprtobar si el usuario existe
+  const { email, password } = req.body
+
+  const usuario = await Usuario.findOne( { where: { email } } )
+  // console.log(usuario)
+
+  //si no existe el usuario renderizamos la vista con otro sms
+  if(!usuario) {
+    return res.render('auth/login', {
+      pagina: 'Iniciar Sesion',
+      csrfToken: req.csrfToken(),
+      errores: [{ msg: 'El Usuario no existe.' }]
+    })
+  }
+
+  // Comprobar q el usuario esta confirmado
+  if(!usuario.confirmado) {
+    return res.render('auth/login', {
+      pagina: 'Iniciar Sesion',
+      csrfToken: req.csrfToken(),
+      errores: [{ msg: 'Tu cuenta no ha sido confirmada.' }]
+    })
+  }
+
+
 
 }
 
