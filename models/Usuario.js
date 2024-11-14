@@ -26,4 +26,11 @@ const Usuario = db. define('usuarios', {
   }
 })
 
+// Metodos personalizados:
+
+/// Comprobar password registrando tus propios prototypes, q son las funciones q les puedes aplicar, se ven en la consola del browser.
+Usuario.prototype.verificarPassword = function(password) {
+  return bcrypt.compareSync(password, this.password)  // password es el q se pasa como parametro, this.password es el de la BD
+}
+
 export default Usuario
