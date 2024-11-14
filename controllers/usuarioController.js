@@ -7,8 +7,30 @@ import { emailRegistro, emailOlvidePassword } from '../helpers/emails.js'
 const formularioLogin = (req, res) => {
   res.render('auth/login', {
     pagina: 'Iniciar Sesion',
-    autenticado: true
+    csrfToken: req.csrfToken()
   }) //como le hemos dicho q las vistas estan en la carpeta views en index.js solo hay q poner el path sin esa carperta
+}
+
+const autenticar = async (req, res) => {
+  // console.log('autenticando...')
+
+  // Validación
+  await check('email').isEmail().withMessage('El email es obligatorio').run(req)
+  await check('password').notEmpty().withMessage('El Password es Obligatorio').run(req)
+
+  let resultado = validationResult(req)
+
+  // Verificar que el resultado este vacio
+  if(!resultado.isEmpty()) {
+    // Errores
+    return res.render('auth/login', {
+      pagina: 'Iniciar Sesion',
+      csrfToken: req.csrfToken(),
+      errores: resultado.array()
+    })
+  }
+
+
 }
 
 const formularioRegistro = (req, res) => {
@@ -234,6 +256,7 @@ const nuevoPassword = async (req, res) => {
 
 export {  // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   formularioLogin,
+  autenticar,
   formularioRegistro,
   registrar,
   confirmarCuenta,
