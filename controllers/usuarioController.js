@@ -168,8 +168,23 @@ const resetPasword = async (req, res) => {
   })
 }
 
-const comprobarToken = (req, res, next) => {
-  next()
+const comprobarToken = async (req, res) => {
+  // Destructuring
+  const { token } = req.params // params pq viene en la url
+
+  // Buscamos usuario
+  const usuario = await Usuario.findOne( { where: { token } } )
+  // console.log(usuario)
+  // mensaje si no hay usuario
+  if(!usuario) {
+    res.render('auth/confirmar-cuenta', {
+      pagina: 'Reestablece tu password.',
+      mensaje: 'Hubo un error al validar tu informacion.',
+      error: true
+    })
+  }
+
+  // Si el usuario es valido, mostrar un formulario para modificar el password
 }
 
 const nuevoPassword = (req, res) => {}
