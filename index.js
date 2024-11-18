@@ -3,6 +3,7 @@ import express from 'express' // extraemos el paquete usamos ECMAScript modules
 import csrf from 'csurf'
 import cookieParser from 'cookie-parser'
 import usuarioRoutes from './routes/usuarioRoutes.js'
+import propiedadesRoutes from './routes/propiedadesRoutes.js'
 import db from './config/db.js'
 
 // crea la funcion
@@ -36,7 +37,7 @@ app.use(express.static('public'))
 // routing los diferentes end points que soporta nuestra app.
 // app.get('/', usuarioRoutes) // get busca la ruta especifica por eso no encuentra nosotros
 app.use('/auth', usuarioRoutes) // use busca la ruta q inicie con lo q esta en las comillas en este caso "/"
-
+app.use('/', propiedadesRoutes)
 
 // Definir un puerto y arrancar el proyecto
 const port= process.env.PORT || 4000
