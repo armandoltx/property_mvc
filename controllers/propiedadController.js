@@ -27,11 +27,12 @@ const crear = async (req, res) => {
     csrfToken: req.csrfToken(),
     categorias,
     precios,
+    datos: {}
   });
 };
 
 const guardar = async (req, res) => {
-  console.log("en guardar...")
+  // console.log("en guardar...")
 
   // Validacion que viene desde la ruta
   let resultado = validationResult(req)
@@ -51,6 +52,7 @@ const guardar = async (req, res) => {
       categorias,
       precios,
       errores: resultado.array(),
+      datos: req.body
     });
   };
 }
