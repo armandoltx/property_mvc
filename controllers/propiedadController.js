@@ -1,6 +1,5 @@
 import { validationResult } from 'express-validator';
-import Precio from '../models/Precio.js';
-import Categoria from '../models/Categoria.js';
+import { Precio, Categoria, Propiedad } from '../models/index.js'
 
 const admin = (req, res) => {
   // res.send('Mis propiedades')
@@ -36,6 +35,7 @@ const guardar = async (req, res) => {
 
   // Validacion que viene desde la ruta
   let resultado = validationResult(req)
+
   // Verificar que el resultado este vacio
   if(!resultado.isEmpty()) {
     // Consultar Modelo de Precio y Categoria
@@ -55,6 +55,37 @@ const guardar = async (req, res) => {
       datos: req.body
     });
   };
+
+  // Crear un registro si pasa las validaciones
+  // console.log(req.body)
+  const {
+    titulo,
+    descripcion,
+    habitaciones,
+    estacionamiento,
+    wc,
+    calle,
+    lat,
+    lng,
+    precio,
+    categoria: categoriaId,
+  } = req.body;
+  try {
+    const propiedadGuardada = await Propiedad.create({
+      titulo,
+      descripcion,
+      habitaciones,
+      estacionamiento,
+      wc,
+      calle,
+      lat,
+      lng,
+      precioId: precio, // se puede hacer asi, o como esta categoria
+      categoriaId
+    });
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 export {
