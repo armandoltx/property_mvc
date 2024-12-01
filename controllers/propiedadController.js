@@ -70,6 +70,10 @@ const guardar = async (req, res) => {
     precio,
     categoria: categoriaId,
   } = req.body;
+
+  // console.log(req.usuario)
+  const { id: usuarioId } = req.usuario // lo asignamos aqui a usuarioId y lo ponemos abajo solo
+
   try {
     const propiedadGuardada = await Propiedad.create({
       titulo,
@@ -81,7 +85,9 @@ const guardar = async (req, res) => {
       lat,
       lng,
       precioId: precio, // se puede hacer asi, o como esta categoria
-      categoriaId
+      categoriaId,
+      usuarioId, // lo ponemos aqui
+      imagen: ''
     });
   } catch (error) {
     console.log(error)
