@@ -18,10 +18,17 @@ const Usuario = db.define('usuarios', {
   token: DataTypes.STRING,
   confirmado: DataTypes.BOOLEAN
 }, {
-  hooks: {
+  hooks: { // son funciones que puedes agregar al modelo
     beforeCreate: async function(usuario) { // este codigo se ejecuta anres de crear la instancia
       const salt = await bcrypt.genSalt(10) // con estas 2 lineas hasheamos el pass
       usuario.password = await bcrypt.hash( usuario.password, salt);
+    }
+  },
+  scopes: { // te sirven para eliminar ciertos campos cuando haces una consulta
+    eliminarPassword: {
+      attributes: {
+        exclude: ['password', 'token', 'confirmado', 'createdAt', 'updatedAt']
+      }
     }
   }
 })
