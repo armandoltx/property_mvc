@@ -13,4 +13,7 @@ Dropzone.options.imagen = {
   addRemoveLinks: true,
   dictRemoveFile: 'Borrar Archivo',
   dictMaxFilesExceeded: 'El Limite es 1 Archivo',
-}
+  headers: {
+    'CSRF-Token': token,
+  }
+};
