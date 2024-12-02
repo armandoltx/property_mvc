@@ -26,7 +26,7 @@ router.post(
   guardar
 );
 
-router.get('/propiedades/agregar-imagen/:id', agregarImagen)
+router.get('/propiedades/agregar-imagen/:id', protegerRuta, agregarImagen) // agregamos el middleware para acceder al usuario
 
 
 export default router // cuando es export default lo podemos importar en otras partes con cualquier
