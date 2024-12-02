@@ -5,7 +5,6 @@ const admin = (req, res) => {
   // res.send('Mis propiedades')
   res.render('propiedades/admin', {
     pagina: 'Mis Propiedades',
-    barra: true,
   });
 };
 
@@ -22,7 +21,6 @@ const crear = async (req, res) => {
 
   res.render('propiedades/crear', {
     pagina: 'Crear Propiedad',
-    barra: true,
     csrfToken: req.csrfToken(),
     categorias,
     precios,
@@ -47,7 +45,6 @@ const guardar = async (req, res) => {
     // Errores
     return res.render('propiedades/crear', {
       pagina: 'Crear Propiedad',
-      barra: true,
       csrfToken: req.csrfToken(),
       categorias,
       precios,
@@ -88,7 +85,7 @@ const guardar = async (req, res) => {
       categoriaId,
       usuarioId, // lo ponemos aqui
       imagen: ''
-    });
+    })
   } catch (error) {
     console.log(error)
   }
@@ -98,5 +95,5 @@ export {
   // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   admin,
   crear,
-  guardar,
-}
+  guardar
+};
