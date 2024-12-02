@@ -86,14 +86,26 @@ const guardar = async (req, res) => {
       usuarioId, // lo ponemos aqui
       imagen: ''
     })
+
+    const { id } = propiedadGuardada
+    res.redirect(`/propiedades/agregar-imagen/${id}`)
   } catch (error) {
     console.log(error)
   }
+}
+
+const agregarImagen = async (req, res) => {
+  // res.send('agregando imagen...')
+  res.render('propiedades/agregar-imagen', {
+    pagina: 'Agregar Imagen'
+
+  })
 }
 
 export {
   // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   admin,
   crear,
-  guardar
+  guardar,
+  agregarImagen,
 };
