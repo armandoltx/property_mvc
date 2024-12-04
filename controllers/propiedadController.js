@@ -126,10 +126,46 @@ const agregarImagen = async (req, res) => {
   });
 }
 
+const almacenarImagen = async (req, res) => {
+  //Validar q la propiedad exista
+  // console.log(req.params)
+  const { id } = req.params;
+
+  const propiedad = await Propiedad.findByPk(id);
+  // console.log(propiedad)
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Validar que la propiedad no este publicada
+  if (propiedad.publicado) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Validar que la propiedad pertecene a quien visita la pagina\
+  // console.log(req.usuario)
+  // console.log(req.usuario.id.toString() === propiedad.usuarioId.toString())
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  try {
+    // Almacenar la imagen y publicar propiedad
+    console.log(req.file)
+    propiedad.imagen = req.file.filename
+    propiedad.publicado = 1
+    await propiedad.save()
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export {
   // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   admin,
   crear,
   guardar,
   agregarImagen,
+  almacenarImagen,
 };
