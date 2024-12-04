@@ -1,10 +1,23 @@
 import { validationResult } from 'express-validator';
-import { Precio, Categoria, Propiedad } from '../models/index.js'
+import { Precio, Categoria, Propiedad, Usuario } from '../models/index.js'
 
-const admin = (req, res) => {
+const admin = async (req, res) => {
   // res.send('Mis propiedades')
+  // cogemos al usuario
+  const { id } = req.usuario
+
+  // nos traemos todas las propiedades del usuario
+  const propiedades = await Propiedad.findAll({
+    where: { usuarioId: id },
+    include: [
+      { model: Categoria, as: 'categoria' }, // para poder ensenar en la vista las categorias, pq las tenemos relacionadas con la Id, le agregamos el alias para usarla en la vista
+      { model: Precio, as: 'precio' }
+    ]
+  })
+
   res.render('propiedades/admin', {
     pagina: 'Mis Propiedades',
+    propiedades
   });
 };
 
