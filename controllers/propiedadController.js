@@ -174,6 +174,117 @@ const almacenarImagen = async (req, res) => {
   }
 }
 
+const editar = async (req, res) => {
+  console.log("desde editar")
+
+  const { id } = req.params
+
+  // Validar que la propiedad exista
+  const propiedad = await Propiedad.findByPk(id);
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Revisar qquien visita la URL es quien creo la propiedad
+  // console.log(req.usuario)
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Consultar Modelo de Precio y Categoria
+  const [categorias, precios] = await Promise.all([
+    // await para que termine el proceso antes de pasar a la siguiente linea
+    Categoria.findAll(),
+    Precio.findAll(),
+  ]);
+
+  res.render('propiedades/editar', {
+    pagina: `Editar Propiedad: ${propiedad.titulo}`,
+    csrfToken: req.csrfToken(),
+    categorias,
+    precios,
+    datos: propiedad,
+  });
+}
+
+const update = async (req, res) => {
+  console.log('guardando cambios');
+
+  // Verificar la validacion
+  // Validacion que viene desde la ruta
+  let resultado = validationResult(req);
+
+  // Verificar que el resultado este vacio
+  if (!resultado.isEmpty()) {
+    // Consultar Modelo de Precio y Categoria
+    const [categorias, precios] = await Promise.all([
+      // await para que termine el proceso antes de pasar a la siguiente linea
+      Categoria.findAll(),
+      Precio.findAll(),
+    ]);
+    // Errores
+    return res.render('propiedades/editar', {
+      pagina: "Editar Propiedad",
+      csrfToken: req.csrfToken(),
+      categorias,
+      precios,
+      errores: resultado.array(),
+      datos: req.body, // va a ser la ultima copia, q no estara en la BD
+    });
+  }
+
+  // Validar que la propiedad exista
+  const { id } = req.params;
+  const propiedad = await Propiedad.findByPk(id);
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Revisar qquien visita la URL es quien creo la propiedad
+  // console.log(req.usuario)
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Reescribie el objeto y actualizarlo
+
+  try {
+    console.log(propiedad);
+    const {
+      titulo,
+      descripcion,
+      habitaciones,
+      estacionamiento,
+      wc,
+      calle,
+      lat,
+      lng,
+      precio: precioId,
+      categoria: categoriaId,
+    } = req.body;
+
+    propiedad.set({
+      titulo,
+      descripcion,
+      habitaciones,
+      estacionamiento,
+      wc,
+      calle,
+      lat,
+      lng,
+      precioId,
+      categoriaId
+    });
+
+    await propiedad.save()
+
+    res.redirect('/mis-propiedades')
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export {
   // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   admin,
@@ -181,4 +292,6 @@ export {
   guardar,
   agregarImagen,
   almacenarImagen,
+  editar,
+  update,
 };

@@ -1,6 +1,14 @@
 import express from "express"
 import { body } from 'express-validator'
-import { admin, crear, guardar, agregarImagen, almacenarImagen } from '../controllers/propiedadController.js';
+import {
+  admin,
+  crear,
+  guardar,
+  agregarImagen,
+  almacenarImagen,
+  editar,
+  update,
+} from '../controllers/propiedadController.js';
 import protegerRuta from "../middleware/protegerRuta.js"
 import upload from "../middleware/subirImagen.js"
 
@@ -35,5 +43,28 @@ router.post('/propiedades/agregar-imagen/:id',
   almacenarImagen
 )
 
+router.get('/propiedades/editar/:id',
+  protegerRuta,
+  editar
+)
+
+router.post(
+  '/propiedades/editar/:id',
+  protegerRuta,
+  // aqui es donde agregamos las validaciones en las rutas. tb pueden estar en el controlador.
+  body('titulo').notEmpty().withMessage('El titulo del Anuncio es Obligatorio'),
+  body('descripcion')
+    .notEmpty()
+    .withMessage('La descripcion no puede ir vacia')
+    .isLength({ max: 200 })
+    .withMessage('La descripcion es muy larga'),
+  body('categoria').isNumeric().withMessage('Selecciona una categoria'), // pq estamos usando el id
+  body('precio').isNumeric().withMessage('Selecciona un rango de precios'), // pq estamos usando el id
+  body('habitaciones').isNumeric().withMessage('Selecciona un numero de habitaciones'), // pq estamos usando el id
+  body('estacionamiento').isNumeric().withMessage('Selecciona un numero de estacionamientos'), // pq estamos usando el id
+  body('wc').isNumeric().withMessage('Selecciona un numero de wc.'), // pq estamos usando el id
+  body('lat').notEmpty().withMessage('Ubica la propiedad en el mapa'),
+  update
+);
 
 export default router // cuando es export default lo podemos importar en otras partes con cualquier
