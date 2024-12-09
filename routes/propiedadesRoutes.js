@@ -8,6 +8,7 @@ import {
   almacenarImagen,
   editar,
   update,
+  eliminar
 } from '../controllers/propiedadController.js';
 import protegerRuta from "../middleware/protegerRuta.js"
 import upload from "../middleware/subirImagen.js"
@@ -66,5 +67,10 @@ router.post(
   body('lat').notEmpty().withMessage('Ubica la propiedad en el mapa'),
   update
 );
+
+router.post('/propiedades/eliminar/:id',
+  protegerRuta,
+  eliminar
+)
 
 export default router // cuando es export default lo podemos importar en otras partes con cualquier

@@ -1,3 +1,4 @@
+import { unlink } from 'node:fs/promises'
 import { validationResult } from 'express-validator';
 import { Precio, Categoria, Propiedad, Usuario } from '../models/index.js'
 
@@ -17,7 +18,8 @@ const admin = async (req, res) => {
 
   res.render('propiedades/admin', {
     pagina: 'Mis Propiedades',
-    propiedades
+    csrfToken: req.csrfToken(),
+    propiedades,
   });
 };
 
@@ -249,7 +251,7 @@ const update = async (req, res) => {
   // Reescribie el objeto y actualizarlo
 
   try {
-    console.log(propiedad);
+    // console.log(propiedad);
     const {
       titulo,
       descripcion,
@@ -285,6 +287,31 @@ const update = async (req, res) => {
   }
 }
 
+const eliminar = async (req, res) =>{
+  // console.log('eliminando...')
+  // Validar que la propiedad exista
+  const { id } = req.params;
+  const propiedad = await Propiedad.findByPk(id);
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Revisar qquien visita la URL es quien creo la propiedad
+  // console.log(req.usuario)
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Eliminar la imagen asociada
+  if(propiedad.imagen) await unlink(`public/uploads/${propiedad.imagen}`)
+
+
+
+  // Eliminar la propiedad
+  await propiedad.destroy()
+  res.redirect('/mis-propiedades');
+}
+
 export {
   // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   admin,
@@ -294,4 +321,5 @@ export {
   almacenarImagen,
   editar,
   update,
+  eliminar,
 };
