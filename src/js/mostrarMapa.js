@@ -1,4 +1,4 @@
-(function() {
+(function() {// 133. Mostrando el mapa de la propiedad
     const lat = document.querySelector('#lat').textContent
     const lng = document.querySelector('#lng').textContent
     const titulo = document.querySelector('#titulo').textContent
@@ -12,5 +12,4 @@
     L.marker([lat, lng])
         .addTo(mapa)
         .bindPopup(titulo)
-    
 })()

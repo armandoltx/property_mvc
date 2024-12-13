@@ -312,6 +312,28 @@ const eliminar = async (req, res) =>{
   res.redirect('/mis-propiedades');
 }
 
+// Muestra una propiedad
+const mostrarPropiedad = async (req, res) => {
+  // res.send("mostrando...")
+  const { id } = req.params;
+  // Comprobar q la propiedad exista
+  const propiedad = await Propiedad.findByPk(id, {
+    include: [
+      { model: Categoria, as: 'categoria' }, // para poder ensenar en la vista las categorias, pq las tenemos relacionadas con la Id, le agregamos el alias para usarla en la vista
+      { model: Precio, as: 'precio' },
+    ]
+  });
+  // console.log(propiedad)
+  if (!propiedad) {
+    return res.redirect('/404');
+  }
+
+  res.render('propiedades/mostrar', {
+    pagina: propiedad.titulo,
+    propiedad,
+  });
+}
+
 export {
   // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   admin,
@@ -322,4 +344,5 @@ export {
   editar,
   update,
   eliminar,
+  mostrarPropiedad
 };
