@@ -4,23 +4,58 @@ import { Precio, Categoria, Propiedad, Usuario } from '../models/index.js'
 
 const admin = async (req, res) => {
   // res.send('Mis propiedades')
-  // cogemos al usuario
-  const { id } = req.usuario
 
-  // nos traemos todas las propiedades del usuario
-  const propiedades = await Propiedad.findAll({
-    where: { usuarioId: id },
-    include: [
-      { model: Categoria, as: 'categoria' }, // para poder ensenar en la vista las categorias, pq las tenemos relacionadas con la Id, le agregamos el alias para usarla en la vista
-      { model: Precio, as: 'precio' }
-    ]
-  })
+  // Leer QueryString
+  // console.log(req.query); // si la url es: http://localhost:4000/mis-propiedades?pagina=2&order=DESC imprime { pagina: "2", order: 'DESC' }
+  // console.log(req.query.pagina)  // imprime solo 2
 
-  res.render('propiedades/admin', {
-    pagina: 'Mis Propiedades',
-    csrfToken: req.csrfToken(),
-    propiedades,
-  });
+  const { pagina: paginaActual } = req.query //extraigo el query y le cambio el nombre
+  const expresion =/^[1-9]$/
+  if(!expresion.test(paginaActual)) {
+    return res.redirect('/mis-propiedades?pagina=1')
+  }
+
+  try {
+    // cogemos al usuario
+    const { id } = req.usuario;
+
+    // Limites y Offset para el paginador
+    const limit = 10;
+    const offset = paginaActual * limit - limit;
+
+    // nos traemos todas las propiedades del usuario
+    const [propiedades, totalPropiedades] = await Promise.all([
+      Propiedad.findAll({
+        limit: limit, // tb es un metodo de secualize
+        offset, //tb existe por eso se llama asi
+        where: { usuarioId: id },
+        include: [
+          { model: Categoria, as: 'categoria' }, // para poder ensenar en la vista las categorias, pq las tenemos relacionadas con la Id, le agregamos el alias para usarla en la vista
+          { model: Precio, as: 'precio' },
+        ],
+      }),
+      Propiedad.count({
+        where: {
+          usuarioId: id, // quiero contar las propiedades q tiene este usuario.
+        },
+      }),
+    ]);
+
+    // console.log(totalPropiedades)
+
+    res.render('propiedades/admin', {
+      pagina: 'Mis Propiedades',
+      csrfToken: req.csrfToken(),
+      propiedades,
+      paginaActual: Number(paginaActual),
+      paginas: Math.ceil(totalPropiedades / limit),
+      totalPropiedades,
+      offset,
+      limit,
+    });
+  } catch (error) {
+    console.log(error)
+  }
 };
 
 // Formulario para crear una nueva propiedad
