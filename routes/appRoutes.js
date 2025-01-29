@@ -1,5 +1,5 @@
 import express from 'express'
-import { inicio, categoria, noEcontrado, buscador } from '../controllers/appController.js';
+import { inicio, categoria, noEncontrado, buscador } from '../controllers/appController.js';
 
 const router = express.Router()
 
@@ -10,7 +10,7 @@ router.get('/', inicio)
 router.get('/categorias/:id', categoria)
 
 // Pagina 404
-router.get('/404', noEcontrado);
+router.get('/404', noEncontrado);
 
 //Buscador
 router.post('/buscador', buscador)

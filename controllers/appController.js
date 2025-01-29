@@ -1,4 +1,5 @@
-import { Precio, Categoria, Propiedad } from '../models/index.js';
+import { Sequelize } from 'sequelize'
+import { Precio, Categoria, Propiedad } from '../models/index.js'
 
 const inicio = async (req, res) => {
   // res.send('inicio')
@@ -38,14 +39,69 @@ const inicio = async (req, res) => {
     categorias,
     precios,
     casas,
-    departamentos
+    departamentos,
+    csrfToken: req.csrfToken()
   });
 }
 
-const categoria = (req, res) => {}
+const categoria = async (req, res) => {
+  const { id } = req.params
+  // console.log(id)
 
-const noEcontrado = (req, res) => {}
+  // Comprobar q la categoria existe
+  const categoria = await Categoria.findByPk(id);
+  if(!categoria) {
+    return res.redirect('/404')
+  }
 
-const buscador = (req, res) => {}
+  // Obtener las propiedades de esa categoria
+  const propiedades = await Propiedad.findAll({
+    where: {
+      categoriaId: id
+    },
+    include: [
+      { model: Precio, as: 'precio' }
+    ]
+  })
 
-export { inicio, categoria, noEcontrado, buscador };
+  res.render('categoria', {
+    pagina: `${categoria.nombre}s en Venta.`,
+    propiedades,
+    csrfToken: req.csrfToken()
+  });
+}
+
+const noEncontrado = (req, res) => {
+  res.render('404', {
+    pagina: 'No Encontrada',
+    csrfToken: req.csrfToken(),
+  });
+};
+
+const buscador = async (req, res) => {
+  // console.log(req.body)
+  const {termino} = req.body // coge el name del formulario
+
+  // Validar que termino (el name del formulario) no este vacio.
+  if(!termino.trim()) {
+    return res.redirect('back')
+  }
+  // Consultar las propiedades
+  const propiedades = await Propiedad.findAll({
+    where: {
+      titulo: {
+        [Sequelize.Op.like]: '%' + termino + '%',
+      },
+    },
+    include: [{ model: Precio, as: 'precio' }],
+  });
+
+  // console.log(propiedades)
+  res.render('busqueda', {
+    pagina: 'Resultados de la Busqueda',
+    propiedades,
+    csrfToken: req.csrfToken(),
+  });
+}
+
+export { inicio, categoria, noEncontrado, buscador };
