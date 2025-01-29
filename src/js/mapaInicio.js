@@ -1,7 +1,8 @@
 (function(){
-    const lat = 34.040967;
-    const lng = -118.1618621;
-    const mapa = L.map('mapa-inicio').setView([lat, lng ], 13);
+  //se usa en el putno 145
+    const lat = -33.864384;
+    const lng = 151.215402;
+    const mapa = L.map('mapa-inicio').setView([lat, lng ], 11);
 
     let markers = new L.FeatureGroup().addTo(mapa)
 
@@ -20,13 +21,14 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapa)
 
-    // Filtrado de Categorias y precios
+    // Filtrado de Categorias y precios (punto 153)
     categoriasSelect.addEventListener('change', e => {
-        filtros.categoria = +e.target.value
-        filtrarPropiedades();
+      // console.log(e.target.value)
+      filtros.categoria = +e.target.value // el +para pasarlo de string a numero
+      filtrarPropiedades();
     })
 
-    preciosSelect.addEventListener('change', e => {
+    preciosSelect.addEventListener('change', e => { // es un eventlistener
         filtros.precio = +e.target.value
         filtrarPropiedades();
     })
@@ -34,7 +36,7 @@
     const obtenerPropiedades = async () => {
         try {
             const url = '/api/propiedades'
-            const respuesta = await fetch(url)
+            const respuesta = await fetch(url) // usamos fetch para consumir la API
             propiedades = await respuesta.json()
             mostrarPropiedades(propiedades)
         } catch (error) {
@@ -71,7 +73,7 @@
 
 
     const filtrarCategoria = propiedad => filtros.categoria ? propiedad.categoriaId === filtros.categoria : propiedad
-    
+
      const filtrarPrecio = propiedad => filtros.precio ? propiedad.precioId === filtros.precio : propiedad
 
 

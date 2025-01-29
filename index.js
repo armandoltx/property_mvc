@@ -4,6 +4,8 @@ import csrf from 'csurf'
 import cookieParser from 'cookie-parser'
 import usuarioRoutes from './routes/usuarioRoutes.js'
 import propiedadesRoutes from './routes/propiedadesRoutes.js'
+import appRoutes from './routes/appRoutes.js'
+import apiRoutes from './routes/apiRoutes.js'
 import db from './config/db.js'
 
 // crea la funcion
@@ -36,8 +38,10 @@ app.set('views', './views') // que carpetas son las views
 app.use(express.static('public'))
 // routing los diferentes end points que soporta nuestra app.
 // app.get('/', usuarioRoutes) // get busca la ruta especifica por eso no encuentra nosotros
+app.use('/', appRoutes)
 app.use('/auth', usuarioRoutes) // use busca la ruta q inicie con lo q esta en las comillas en este caso "/"
 app.use('/', propiedadesRoutes)
+app.use('/api', apiRoutes)
 
 // Definir un puerto y arrancar el proyecto
 const port= process.env.PORT || 4000
