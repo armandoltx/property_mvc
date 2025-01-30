@@ -1,6 +1,7 @@
 import { unlink } from 'node:fs/promises'
 import { validationResult } from 'express-validator';
-import { Precio, Categoria, Propiedad, Usuario } from '../models/index.js'
+import { Precio, Categoria, Propiedad, Mensaje, Usuario } from '../models/index.js'
+import { esVendedor, formatearFecha } from '../helpers/index.js';
 
 const admin = async (req, res) => {
   // res.send('Mis propiedades')
@@ -32,6 +33,7 @@ const admin = async (req, res) => {
         include: [
           { model: Categoria, as: 'categoria' }, // para poder ensenar en la vista las categorias, pq las tenemos relacionadas con la Id, le agregamos el alias para usarla en la vista
           { model: Precio, as: 'precio' },
+          { model: Mensaje, as: 'mensajes' }
         ],
       }),
       Propiedad.count({
@@ -351,6 +353,9 @@ const eliminar = async (req, res) =>{
 const mostrarPropiedad = async (req, res) => {
   // res.send("mostrando...")
   const { id } = req.params;
+
+  // console.log(req.usuario)
+
   // Comprobar q la propiedad exista
   const propiedad = await Propiedad.findByPk(id, {
     include: [
@@ -363,15 +368,111 @@ const mostrarPropiedad = async (req, res) => {
     return res.redirect('/404');
   }
 
+  // console.log(esVendedor(req.usuario?.id, propiedad.usuarioId));
+
   res.render('propiedades/mostrar', {
     pagina: propiedad.titulo,
     propiedad,
-    csrfToken: req.csrfToken()
-  });
+    csrfToken: req.csrfToken(),
+    usuario: req.usuario,
+    esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId )
+  })
 }
 
+const enviarMensaje = async (req, res) => {
+  // res.send("mostrando...")
+  const { id } = req.params;
+
+  // Comprobar q la propiedad exista
+  const propiedad = await Propiedad.findByPk(id, {
+    include: [
+      { model: Categoria, as: 'categoria' }, // para poder ensenar en la vista las categorias, pq las tenemos relacionadas con la Id, le agregamos el alias para usarla en la vista
+      { model: Precio, as: 'precio' },
+    ],
+  });
+
+  // console.log(propiedad)
+  if (!propiedad) {
+    return res.redirect('/404');
+  }
+
+  // Renderizar los errores
+  let resultado = validationResult(req)
+
+  // Verificar que el resultado este vacio
+  if(!resultado.isEmpty()) {
+    return res.render('propiedades/mostrar', {
+      pagina: propiedad.titulo,
+      propiedad,
+      csrfToken: req.csrfToken(),
+      usuario: req.usuario,
+      esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+      errores: resultado.array()
+    });
+  }
+
+  // Alamcenar el mensaje
+  // console.log(req.body) // de lo q se ingresa en el formulario
+  // console.log(req.params) // lo q viene de la url
+  // console.log(req.usuario) // es una instancia local
+
+  const { mensaje } =req.body
+  const { id: propiedadId } = req.params
+  const { id: usuarioId } = req.usuario
+
+  await Mensaje.create({
+    mensaje,
+    propiedadId,
+    usuarioId
+  })
+
+  // res.render('propiedades/mostrar', {
+  //   pagina: propiedad.titulo,
+  //   propiedad,
+  //   csrfToken: req.csrfToken(),
+  //   usuario: req.usuario,
+  //   esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+  //   enviado: true
+  // })
+
+  res.redirect('/');
+}
+
+// Leer mensajes recibdos
+ const verMensajes = async (req, res) => {
+  // res.send("Mensajes aqui")
+  const { id } = req.params;
+
+  // Validar que la propiedad exista
+  const propiedad = await Propiedad.findByPk(id, {
+    include: [
+      { model: Mensaje, as: 'mensajes',
+        include: [
+          { model: Usuario.scope('eliminarPassword'), as: 'usuario' }
+        ]
+      },
+    ],
+  });
+
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Revisar que quien visita la URl, es quien creo la propiedad
+  if (propiedad.usuarioId.toString() !== req.usuario.id.toString()) {
+    return res.redirect('/mis-propiedades');
+  }
+
+
+  res.render('propiedades/mensajes', {
+    pagina: 'Mensajes',
+    mensajes: propiedad.mensajes,
+    formatearFecha
+  })
+ }
+
 export {
-  // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
+  // es un export nombrado, hay q usar llaves y el mismo nombre cuando lo importas => import { formularioLogin } from '../../'
   admin,
   crear,
   guardar,
@@ -380,5 +481,7 @@ export {
   editar,
   update,
   eliminar,
-  mostrarPropiedad
-};
+  mostrarPropiedad,
+  enviarMensaje,
+  verMensajes
+}

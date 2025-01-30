@@ -9,10 +9,13 @@ import {
   editar,
   update,
   eliminar,
-  mostrarPropiedad
+  mostrarPropiedad,
+  enviarMensaje,
+  verMensajes,
 } from '../controllers/propiedadController.js';
 import protegerRuta from "../middleware/protegerRuta.js"
 import upload from "../middleware/subirImagen.js"
+import identificarUsuario from "../middleware/identificarUsuario.js"
 
 const router = express.Router()
 
@@ -75,7 +78,22 @@ router.post('/propiedades/eliminar/:id',
 )
 
 // Area Publica
-router.get('/propiedad/:id', mostrarPropiedad);
+router.get('/propiedad/:id',
+  identificarUsuario,
+  mostrarPropiedad
+);
+
+// Almacenar los mensajes
+router.post('/propiedad/:id',
+  identificarUsuario,
+  body('mensaje').isLength({min: 10}).withMessage('El Mensaje no puede ir vacio o es muy corto.'),
+  enviarMensaje
+);
+
+router.get('/mensajes/:id',
+  protegerRuta,
+  verMensajes
+)
 
 
 export default router // cuando es export default lo podemos importar en otras partes con cualquier
