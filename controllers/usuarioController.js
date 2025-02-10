@@ -75,6 +75,11 @@ const autenticar = async (req, res) => {
 
 }
 
+const cerrarSesion = (req, res) => {
+  // res.send('Cerrando Sesion')
+  return res.clearCookie('_token').status(200).redirect('/auth/login')
+}
+
 const formularioRegistro = (req, res) => {
   res.render('auth/registro', {
     pagina: 'Crea tu cuenta',
@@ -299,6 +304,7 @@ const nuevoPassword = async (req, res) => {
 export {  // es un export nombrado, hay q usar llaves y el mimso nombre cuando lo importas => import { formularioLogin } from '../../'
   formularioLogin,
   autenticar,
+  cerrarSesion,
   formularioRegistro,
   registrar,
   confirmarCuenta,
