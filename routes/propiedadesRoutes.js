@@ -9,6 +9,7 @@ import {
   editar,
   update,
   eliminar,
+  cambiarEstado,
   mostrarPropiedad,
   enviarMensaje,
   verMensajes,
@@ -72,10 +73,15 @@ router.post(
   update
 );
 
-router.post('/propiedades/eliminar/:id',
+router.post('/propiedades/eliminar/:id',  //se hace desde el formulario q solo soporta get y post
   protegerRuta,
   eliminar
 )
+
+router.put('/propiedades/:id', //se hace desde js q soporta todos los verbos
+  protegerRuta,
+  cambiarEstado
+);
 
 // Area Publica
 router.get('/propiedad/:id',

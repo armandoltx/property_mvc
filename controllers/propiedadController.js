@@ -349,6 +349,32 @@ const eliminar = async (req, res) =>{
   res.redirect('/mis-propiedades');
 }
 
+// Modifica el estado de una propiedad
+const cambiarEstado = async (req, res) => {
+  // console.log('cambiando estado')
+  // Validar que la propiedad exista
+  const { id } = req.params;
+  const propiedad = await Propiedad.findByPk(id);
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // Revisar qquien visita la URL es quien creo la propiedad
+  // console.log(req.usuario)
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect('/mis-propiedades');
+  }
+
+  // console.log(propiedad)
+  // Actualizar
+  propiedad.publicado = !propiedad.publicado
+
+  await propiedad.save()
+  res.json({
+    resultado: 'ok'
+  })
+}
+
 // Muestra una propiedad
 const mostrarPropiedad = async (req, res) => {
   // res.send("mostrando...")
@@ -364,7 +390,7 @@ const mostrarPropiedad = async (req, res) => {
     ]
   });
   // console.log(propiedad)
-  if (!propiedad) {
+  if (!propiedad || !propiedad.publicado) {
     return res.redirect('/404');
   }
 
@@ -481,6 +507,7 @@ export {
   editar,
   update,
   eliminar,
+  cambiarEstado,
   mostrarPropiedad,
   enviarMensaje,
   verMensajes
